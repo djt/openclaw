@@ -5,6 +5,9 @@ services:
       dockerfile: Dockerfile
     image: openclaw:local
     user: "0:0"
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     environment:
       HOME: /home/node
       NODE_ENV: production
@@ -43,6 +46,9 @@ services:
   openclaw-shell:
     image: openclaw:local
     user: "0:0"
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8    
     depends_on:
       - openclaw-gateway
     network_mode: "service:openclaw-gateway"
