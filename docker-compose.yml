@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: openclaw:local
+    user: "0:0"
     environment:
       HOME: /home/node
       NODE_ENV: production
@@ -20,15 +21,12 @@ services:
     init: true
     restart: unless-stopped
     command:
-      [
-        "node",
-        "dist/index.js",
-        "gateway",
-        "--bind",
-        "lan",
-        "--port",
-        "18789"
-      ]
+      - sh
+      - -lc
+      - |
+        mkdir -p /home/node/.openclaw /home/node/.openclaw/workspace
+        chown -R node:node /home/node/.openclaw
+        exec su node -s /bin/sh -c 'node dist/index.js gateway --bind lan --port 18789'
     healthcheck:
       test:
         [
@@ -44,6 +42,7 @@ services:
 
   openclaw-shell:
     image: openclaw:local
+    user: "0:0"
     depends_on:
       - openclaw-gateway
     network_mode: "service:openclaw-gateway"
@@ -60,7 +59,13 @@ services:
     stdin_open: true
     tty: true
     init: true
-    command: ["sh", "-lc", "sleep infinity"]
+    command:
+      - sh
+      - -lc
+      - |
+        mkdir -p /home/node/.openclaw /home/node/.openclaw/workspace
+        chown -R node:node /home/node/.openclaw
+        exec sleep infinity
 
 volumes:
   openclaw-config:
